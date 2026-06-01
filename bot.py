@@ -1228,34 +1228,21 @@ async def check_vip_expiry():
 # ============================================================
 # 🚀 ISHGA TUSHIRISH
 # ============================================================
-async def on_startup(app: web.Application):
+async def main():
     await db_init()
-    await bot.set_webhook(WEBHOOK_URL)
+    await bot.delete_webhook()
 
     scheduler = AsyncIOScheduler(timezone="Asia/Tashkent")
     scheduler.add_job(check_vip_expiry, "cron", hour=0, minute=0)
     scheduler.start()
-    app["scheduler"] = scheduler
-    log.info(f"✅ Bot ishga tushdi. Webhook: {WEBHOOK_URL}")
 
-async def on_shutdown(app: web.Application):
-    scheduler = app.get("scheduler")
-    if scheduler:
+    log.info("✅ Bot polling rejimida ishga tushdi!")
+    try:
+        await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
+    finally:
         scheduler.shutdown()
-    await bot.delete_webhook()
-    await bot.session.close()
-    log.info("Bot to'xtatildi.")
-
-def main():
-    app = web.Application()
-    app.on_startup.append(on_startup)
-    app.on_shutdown.append(on_shutdown)
-
-    SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path=WEBHOOK_PATH)
-    setup_application(app, dp, bot=bot)
-
-    web.run_app(app, host=WEB_SERVER_HOST, port=WEB_SERVER_PORT)
+        await bot.session.close()
+        log.info("Bot to'xtatildi.")
 
 if __name__ == "__main__":
-    main()
-
+    asyncio.run(main())
