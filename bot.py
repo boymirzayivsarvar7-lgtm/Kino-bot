@@ -29,7 +29,7 @@ from aiogram.client.default import DefaultBotProperties
 # ============================================================
 # ⚙️ SOZLAMALAR
 # ============================================================
-BOT_TOKEN = "8776094927:AAHA7sDHDNyBIXdClXbrqtW7E62qG-8q5MY"
+BOT_TOKEN = "8776094927:AAHFjBOfUiFRJEwxMwsCCS4cZcMnKOx18XM"
 ADMIN_ID = 8088975078
 KANAL_ID = -1003908351921
 KARTA_RAQAM = "8600 0000 0000 0000"
