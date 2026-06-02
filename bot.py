@@ -664,7 +664,7 @@ async def save_movie_cb(cb: CallbackQuery, state: FSMContext):
             "VALUES (?,?,?,?,?,?,?,?,?)",
             (data['kod'], data['nom'], data['yil'], data['mamlakat'],
              data['janr'], data['rejissyor'], data['davomiylik'],
-             data['file_id_720'], data['file_id_1080'])
+             data.get['file_id_480', ''], data.get['file_id_1080', ''])
         )
         await state.clear()
         await cb.message.edit_text(
@@ -1166,16 +1166,23 @@ async def set_add_channel_start(cb: CallbackQuery, state: FSMContext):
     )
     await cb.answer()
 
+# YANGI:
 @router.message(AddChannel.channel)
 async def add_channel_save(msg: Message, state: FSMContext):
     if msg.from_user.id != ADMIN_ID:
         return
+    text = msg.text.strip()
     try:
-        chat = await bot.get_chat(msg.text.strip())
+        # username yoki ID bo'lishi mumkin
+        if text.lstrip("-").isdigit():
+            chat_id = int(text)
+        else:
+            chat_id = text if text.startswith("@") else f"@{text}"
+        chat = await bot.get_chat(chat_id)
         me = await bot.get_me()
         bot_member = await bot.get_chat_member(chat.id, me.id)
         if bot_member.status not in ("administrator", "creator"):
-            await msg.answer("❌ Bot bu kanalda admin emas! Avval adminlik bering.")
+            await msg.answer("❌ Bot bu kanalda admin emas!\nAvval botga adminlik bering.")
             return
         username = f"@{chat.username}" if chat.username else str(chat.id)
         await db_exec(
@@ -1185,7 +1192,7 @@ async def add_channel_save(msg: Message, state: FSMContext):
         await state.clear()
         await msg.answer(f"✅ <b>{chat.title}</b> kanali qo'shildi!\n📢 {username}")
     except Exception as e:
-        await msg.answer(f"❌ Kanal topilmadi:\n<code>{e}</code>")
+        await msg.answer(f"❌ Xatolik:\n<code>{e}</code>\n\nUsername yoki ID to'g'ri ekanligini tekshiring.")
 
 @router.callback_query(F.data == "set_del_channel")
 async def set_del_channel(cb: CallbackQuery):
@@ -1257,8 +1264,8 @@ async def send_movie_to_user(user_id: int, movie_code: str):
             protect = False
             kb = movie_vip_kb(movie_code)
         else:
-            file_id = movie["file_id_720"]
-            quality = "720p"
+            file_id = movie["file_id_480"]
+            quality = "480p"
             protect = True
             kb = movie_free_kb(movie_code)
         if not file_id:
