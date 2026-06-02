@@ -515,50 +515,67 @@ async def add_movie_nom(msg: Message, state: FSMContext):
 async def add_movie_yil(msg: Message, state: FSMContext):
     if msg.from_user.id != ADMIN_ID:
         return
-    await state.update_data(yil=msg.text.strip())
+    val = "" if msg.text.strip() == "/skip" else msg.text.strip()
+    await state.update_data(yil=val)
     await state.set_state(AddMovie.mamlakat)
-    await msg.answer("4️⃣ <b>Mamlakatni</b> yuboring (masalan: AQSh):")
+    await msg.answer("4️⃣ <b>Mamlakatni</b> yuboring:\n/skip — o'tkazib yuborish")
 
 @router.message(AddMovie.mamlakat)
 async def add_movie_mamlakat(msg: Message, state: FSMContext):
     if msg.from_user.id != ADMIN_ID:
         return
-    await state.update_data(mamlakat=msg.text.strip())
+    val = "" if msg.text.strip() == "/skip" else msg.text.strip()
+    await state.update_data(mamlakat=val)
     await state.set_state(AddMovie.janr)
-    await msg.answer("5️⃣ <b>Janrni</b> yuboring (masalan: Drama):")
+    await msg.answer("5️⃣ <b>Janrni</b> yuboring:\n/skip — o'tkazib yuborish")
+
 
 @router.message(AddMovie.janr)
 async def add_movie_janr(msg: Message, state: FSMContext):
     if msg.from_user.id != ADMIN_ID:
         return
-    await state.update_data(janr=msg.text.strip())
+    val = "" if msg.text.strip() == "/skip" else msg.text.strip()
+    await state.update_data(janr=val)
     await state.set_state(AddMovie.rejissyor)
-    await msg.answer("6️⃣ <b>Rejissyor</b> ismini yuboring:")
+    await msg.answer("6️⃣ <b>Rejissyor</b> ismini yuboring:\n/skip — o'tkazib yuborish")
 
 @router.message(AddMovie.rejissyor)
 async def add_movie_rejissyor(msg: Message, state: FSMContext):
     if msg.from_user.id != ADMIN_ID:
         return
-    await state.update_data(rejissyor=msg.text.strip())
-await state.set_state(AddMovie.video_720)
-await msg.answer("7️⃣ <b>480p</b> videoni yuboring:")
+    val = "" if msg.text.strip() == "/skip" else msg.text.strip()
+    await state.update_data(rejissyor=val)
+    await state.set_state(AddMovie.video_480)
+    await msg.answer("7️⃣ <b>480p</b> videoni yuboring:\n/skip — o'tkazib yuborish")
 
-@router.message(AddMovie.video_720, F.video)
-async def add_movie_720(msg: Message, state: FSMContext):
+@router.message(AddMovie.video_480, F.text == "/skip")
+async def add_movie_480_skip(msg: Message, state: FSMContext):
+    if msg.from_user.id != ADMIN_ID:
+        return
+    await state.update_data(file_id_480="", davomiylik="")
+    await state.set_state(AddMovie.video_1080)
+    await msg.answer("8️⃣ <b>1080p</b> videoni yuboring:")
+
+@router.message(AddMovie.video_480, F.video)
+async def add_movie_480(msg: Message, state: FSMContext):
     if msg.from_user.id != ADMIN_ID:
         return
     try:
-        sent = await bot.send_video(KANAL_ID, msg.video.file_id, caption="🎬 720p")
-        await state.update_data(file_id_720=sent.video.file_id)
+        duration_sec = msg.video.duration or 0
+        mins = duration_sec // 60
+        secs = duration_sec % 60
+        davomiylik = f"{mins}:{secs:02d}"
+        sent = await bot.send_video(KANAL_ID, msg.video.file_id, caption="🎬 480p")
+        await state.update_data(file_id_480=sent.video.file_id, davomiylik=davomiylik)
         await state.set_state(AddMovie.video_1080)
-        await msg.answer("✅ 720p saqlandi!\n\n9️⃣ <b>1080p</b> videoni yuboring:")
+        await msg.answer(f"✅ 480p saqlandi! ⏱ Davomiylik: {davomiylik}\n\n8️⃣ <b>1080p</b> videoni yuboring:\n/skip — o'tkazib yuborish")
     except Exception as e:
-        log.error(f"Video 720 xatosi: {e}")
-        await msg.answer("❌ Videoni kanalga yuborishda xatolik. Bot kanalda admin ekanligini tekshiring.")
+        log.error(f"Video 480 xatosi: {e}")
+        await msg.answer("❌ Videoni kanalga yuborishda xatolik.")
 
-@router.message(AddMovie.video_720)
-async def add_movie_720_wrong(msg: Message):
-    await msg.answer("🎬 Iltimos, faqat <b>video fayl</b> yuboring!")
+@router.message(AddMovie.video_480)
+async def add_movie_480_wrong(msg: Message):
+    await msg.answer("🎬 Video yuboring yoki /skip yozing!")
 
 @router.message(AddMovie.video_1080, F.video)
 async def add_movie_1080(msg: Message, state: FSMContext):
