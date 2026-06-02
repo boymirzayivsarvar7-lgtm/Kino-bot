@@ -540,16 +540,8 @@ async def add_movie_rejissyor(msg: Message, state: FSMContext):
     if msg.from_user.id != ADMIN_ID:
         return
     await state.update_data(rejissyor=msg.text.strip())
-    await state.set_state(AddMovie.davomiylik)
-    await msg.answer("7️⃣ <b>Davomiylikni</b> yuboring (masalan: 1:45):")
-
-@router.message(AddMovie.davomiylik)
-async def add_movie_davomiylik(msg: Message, state: FSMContext):
-    if msg.from_user.id != ADMIN_ID:
-        return
-    await state.update_data(davomiylik=msg.text.strip())
-    await state.set_state(AddMovie.video_720)
-    await msg.answer("8️⃣ <b>480p</b> videoni yuboring:")
+await state.set_state(AddMovie.video_720)
+await msg.answer("7️⃣ <b>480p</b> videoni yuboring:")
 
 @router.message(AddMovie.video_720, F.video)
 async def add_movie_720(msg: Message, state: FSMContext):
