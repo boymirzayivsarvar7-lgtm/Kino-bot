@@ -34,8 +34,8 @@ ADMIN_ID = 8088975078
 KANAL_ID = -1003908351921
 KARTA_RAQAM = "8600 0000 0000 0000"
 
-WEBHOOK_HOST = os.getenv("RENDER_EXTERNAL_URL", "https://kino-bot-ppwl.onrender.com").rstrip("/") 
-WEBHOOK_PATH = "/webhook" 
+WEBHOOK_HOST = os.getenv("RENDER_EXTERNAL_URL", "https://kino-bot-ppwl.onrender.com").rstrip("/")
+WEBHOOK_PATH = "/webhook"
 WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 WEB_SERVER_HOST = "0.0.0.0"
 WEB_SERVER_PORT = int(os.getenv("PORT", 10000))
@@ -1713,17 +1713,21 @@ async def on_shutdown(app: web.Application):
     log.info("🔴 Bot to'xtatildi.")
 
 async def health_check(request):
+    """Render health check uchun"""
     return web.Response(text="OK")
 
 def main():
     app = web.Application()
-    app.router.add_get("/", health_check)  # ← shu qator qo'shiladi
     app.on_startup.append(on_startup)
     app.on_shutdown.append(on_shutdown)
+
+    # Health check endpoint (Render uchun)
+    app.router.add_get("/", health_check)
 
     SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path=WEBHOOK_PATH)
     setup_application(app, dp, bot=bot)
 
     web.run_app(app, host=WEB_SERVER_HOST, port=WEB_SERVER_PORT)
+
 if __name__ == "__main__":
     main()
