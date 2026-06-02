@@ -199,7 +199,7 @@ async def check_subscription(user_id: int) -> tuple:
 # ============================================================
 def main_menu_kb(is_admin: bool = False):
     """Asosiy klaviatura — admin bo'lsa Admin Panel tugmasi ham chiqadi"""
-    rows = [[KeyboardButton(text="🌟 VIP"), KeyboardButton(text="📊 Statistika")]]
+    rows = [[KeyboardButton(text="🌟 VIP")]]
     if is_admin:
         rows.append([KeyboardButton(text="🔑 Admin Panel")])
     return ReplyKeyboardMarkup(keyboard=rows, resize_keyboard=True)
@@ -1273,7 +1273,7 @@ async def movie_code_handler(msg: Message, state: FSMContext):
             return
 
         # Tugma matnlari kino kodi sifatida qabul qilinmasin
-        if msg.text in ["🌟 VIP", "📊 Statistika", "🔑 Admin Panel"]:
+        if msg.text in ["🌟 VIP", "🔑 Admin Panel"]:
             return
 
         # Anti-flood
