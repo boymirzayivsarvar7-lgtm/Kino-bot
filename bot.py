@@ -577,6 +577,48 @@ async def add_movie_480(msg: Message, state: FSMContext):
 async def add_movie_480_wrong(msg: Message):
     await msg.answer("🎬 Video yuboring yoki /skip yozing!")
 
+@router.message(AddMovie.video_1080, F.text == "/skip")
+async def add_movie_1080_skip(msg: Message, state: FSMContext):
+    if msg.from_user.id != ADMIN_ID:
+        return
+
+    await state.update_data(file_id_1080=None)
+    await state.set_state(AddMovie.tasdiqlash)
+
+    data = await state.get_data()
+
+    preview = (
+        f"📋 <b>Kino ma'lumotlari:</b>\n\n"
+        f"🔑 Kod: <b>{data['kod']}</b>\n"
+        f"🎬 Nom: {data['nom']}\n"
+        f"🗓 Yil: {data.get('yil', '-')}\n"
+        f"🌍 Mamlakat: {data.get('mamlakat', '-')}\n"
+        f"🎭 Janr: {data.get('janr', '-')}\n"
+        f"🎬 Rejissyor: {data.get('rejissyor', '-')}\n"
+        f"⏱ Davomiylik: {data.get('davomiylik', '-')}\n\n"
+        f"✅ Saqlashni tasdiqlaysizmi?"
+    )
+
+    await msg.answer(
+        preview,
+        reply_markup=InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text="✅ Tasdiqlash",
+                        callback_data="confirm_add_movie"
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        text="❌ Bekor qilish",
+                        callback_data="cancel_add_movie"
+                    )
+                ]
+            ]
+        )
+    )
+
 @router.message(AddMovie.video_1080, F.video)
 async def add_movie_1080(msg: Message, state: FSMContext):
     if msg.from_user.id != ADMIN_ID:
