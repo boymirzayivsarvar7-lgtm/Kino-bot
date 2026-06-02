@@ -84,7 +84,7 @@ async def db_init():
             genre TEXT,
             director TEXT,
             duration TEXT,
-            file_id_720 TEXT,
+            file_id_480 TEXT,
             file_id_1080 TEXT,
             rating_sum INTEGER DEFAULT 0,
             rating_count INTEGER DEFAULT 0,
@@ -295,12 +295,12 @@ def movie_caption(m: dict, quality: str) -> str:
     return (
         f"╔══════════════════════╗\n"
         f"║ 🎬 {m['title'][:16]:<16} ║\n"
-        f"║ 🗓 Yil: {m['year']:<14} ║\n"
-        f"║ 🌍 {m['country']:<18} ║\n"
-        f"║ 🎭 {m['genre']:<18} ║\n"
-        f"║ 🎬 {m['director']:<18} ║\n"
-        f"║ ⏱ {m['duration']:<19} ║\n"
-        f"║ ⭐ {stars}  {avg}/5    ║\n"
+        f"║ 🗓 Yil: {m['year']:<14}  ║\n"
+        f"║ 🌍 {m['country']:<18}    ║\n"
+        f"║ 🎭 {m['genre']:<18}      ║\n"
+        f"║ 🎬 {m['director']:<18}   ║\n"
+        f"║ ⏱ {m['duration']:<19}    ║\n"
+        f"║ ⭐ {stars}  {avg}/5      ║\n"
         f"╚══════════════════════╝\n"
         f"📺 Sifat: <b>{quality}</b>"
     )
@@ -323,8 +323,7 @@ class AddMovie(StatesGroup):
     mamlakat = State()
     janr = State()
     rejissyor = State()
-    davomiylik = State()
-    video_720 = State()
+    video_480 = State()
     video_1080 = State()
     tasdiqlash = State()
 
@@ -366,7 +365,7 @@ async def start_handler(msg: Message):
             "📽 Bu botda siz eng so'nggi kinolarni tomosha qilishingiz mumkin.\n\n"
             "📌 <b>Qanday ishlaydi?</b>\n"
             "• Kino kodini yuboring → kino keladi\n"
-            "• Bepul: 720p sifatda\n"
+            "• Bepul: 480p sifatda\n"
             "• VIP: 1080p sifatda (yuklab olish mumkin)\n\n"
             "👇 Pastdagi tugmani bosing:"
         )
@@ -550,7 +549,7 @@ async def add_movie_davomiylik(msg: Message, state: FSMContext):
         return
     await state.update_data(davomiylik=msg.text.strip())
     await state.set_state(AddMovie.video_720)
-    await msg.answer("8️⃣ <b>720p</b> videoni yuboring:")
+    await msg.answer("8️⃣ <b>480p</b> videoni yuboring:")
 
 @router.message(AddMovie.video_720, F.video)
 async def add_movie_720(msg: Message, state: FSMContext):
