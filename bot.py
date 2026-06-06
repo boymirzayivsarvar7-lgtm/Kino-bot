@@ -27,7 +27,7 @@ from aiogram.client.default import DefaultBotProperties
 # ============================================================
 # ⚙️ SOZLAMALAR
 # ============================================================
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+BOT_TOKEN = ("8776094927:AAGFkjw_35FMSKoCPC8at-iKXQ0Kgvxl2Hs")
 ADMIN_ID = int(os.getenv("ADMIN_ID", "8088975078"))
 KANAL_ID = int(os.getenv("KANAL_ID", "-1003908351921"))
 
